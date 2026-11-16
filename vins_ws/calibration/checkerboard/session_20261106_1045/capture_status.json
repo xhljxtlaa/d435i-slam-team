@@ -1,0 +1,13 @@
+{
+  "samples": 48,
+  "pattern": [
+    8,
+    6
+  ],
+  "square_mm": 24.4,
+  "image_size": [
+    640,
+    480
+  ],
+  "grid_cells": 4
+}
