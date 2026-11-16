@@ -1,0 +1,20 @@
+{
+  "/point_cloud": {
+    "count": 172,
+    "points": 87
+  },
+  "/accumulated_cloud": {
+    "count": 15,
+    "points": 72
+  },
+  "/path": {
+    "count": 59,
+    "poses": 218
+  },
+  "/odometry": {
+    "count": 171
+  },
+  "/vins_estimator_reset": {
+    "count": 0
+  }
+}

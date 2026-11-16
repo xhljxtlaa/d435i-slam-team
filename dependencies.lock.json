@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "collected_at": "2026-11-16",
+  "repositories": {
+    "vins": {
+      "url": "https://github.com/fanhong-li/VINS-Fusion-ROS2-Humble.git",
+      "commit": "8993f559d93f7235c7cefe8f4951ef349d8cf245"
+    },
+    "orb3": {
+      "url": "https://github.com/UZ-SLAMLab/ORB_SLAM3.git",
+      "commit": "4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4"
+    },
+    "pangolin": {
+      "url": "https://github.com/stevenlovegrove/Pangolin.git",
+      "commit": "dd801d244db3a8e27b7fe8020cd751404aa818fd"
+    },
+    "ceres": {
+      "url": "https://ceres-solver.googlesource.com/ceres-solver",
+      "commit": "f68321e7de8929fbcdb95dd42877531e64f72f66"
+    }
+  }
+}

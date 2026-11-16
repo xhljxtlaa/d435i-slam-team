@@ -1,0 +1,12 @@
+{
+  "poses": 7894,
+  "active_map_resets": 19,
+  "max_consecutive_position_step_m": 2.301528959304709,
+  "position_steps_over_0_1m": 12,
+  "last_30s_position_axis_span_m": [
+    0.0003351270000000184,
+    0.0002998859999999992,
+    0.00038692699999999525
+  ],
+  "note": "Camera motion not independently recorded; these values do not establish stationary drift. Live Path was not segmented at map resets."
+}

@@ -1,0 +1,29 @@
+{
+  "cloud_message_counts": {
+    "surface": 12,
+    "sparse": 12,
+    "current_depth": 12
+  },
+  "cloud_point_counts": {
+    "surface": {
+      "min": 3406,
+      "max": 3406
+    },
+    "sparse": {
+      "min": 894,
+      "max": 894
+    },
+    "current_depth": {
+      "min": 6311,
+      "max": 6728
+    }
+  },
+  "frames": [
+    "orb3_map"
+  ],
+  "paired_pose_depth_cloud_frames": 11,
+  "max_backprojected_depth_error_metres": 2.5551266547019225e-07,
+  "max_reprojected_pixel_rounding_error": 6.193180337277226e-05,
+  "failures": [],
+  "passed": true
+}

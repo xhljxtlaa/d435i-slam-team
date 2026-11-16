@@ -1,0 +1,35 @@
+{
+  "duration_seconds": 55.0,
+  "streams": {
+    "image": {
+      "count": 1425,
+      "mean_hz": 25.91758765465335,
+      "strictly_monotonic": true,
+      "max_gap_seconds": 0.1333622932434082
+    },
+    "depth": {
+      "count": 1218,
+      "mean_hz": 22.176988283529653,
+      "strictly_monotonic": true,
+      "max_gap_seconds": 0.30004405975341797
+    },
+    "imu": {
+      "count": 11015,
+      "mean_hz": 200.2498344947997,
+      "strictly_monotonic": true,
+      "max_gap_seconds": 0.009987354278564453
+    },
+    "pose": {
+      "count": 0,
+      "mean_hz": null,
+      "strictly_monotonic": true,
+      "max_gap_seconds": null
+    }
+  },
+  "nearest_depth_image_dt_median_seconds": 0.0,
+  "nonzero_finite_depth_fraction_median": 0.18166178385416665,
+  "pose_finite": null,
+  "pose_axis_span_metres": null,
+  "tracking_state_counts": {},
+  "imu_initialized_seen": false
+}

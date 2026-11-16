@@ -1,0 +1,19 @@
+{
+  "/point_cloud": {
+    "count": 74,
+    "last_stamp": 1793936739.8878,
+    "points": 0
+  },
+  "/accumulated_cloud": {
+    "count": 0
+  },
+  "/path": {
+    "count": 74,
+    "last_stamp": 1793936740.0545127,
+    "poses": 3677
+  },
+  "/odometry": {
+    "count": 41,
+    "last_stamp": 1793936736.2200701
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "verified_at": "2026-11-06T12:17:58.113970+08:00",
+  "dependency_check": "passed",
+  "frozen_executable_same_as_working_build": true,
+  "isolated_frozen_binary_recovery_test": "passed: initial trajectory, reset events, cleared path, resumed trajectory",
+  "launcher_full_hardware_start": "not executed; current live workspace session intentionally left running",
+  "scope": "Verified on current computer with installed ROS2 Humble dependencies"
+}

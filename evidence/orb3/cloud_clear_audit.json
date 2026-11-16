@@ -1,0 +1,26 @@
+{
+  "saved_before_clear": "Saved 4579 surface points to /home/he/orb3_ws/logs/run_20261113_115318_tnvkhB/map.ply",
+  "before": {
+    "surface_points": 4579,
+    "sparse_points": 689,
+    "map_id": 1,
+    "map_keyframes": 3,
+    "cached_depth_keyframes": 3,
+    "map_epoch": 2,
+    "voxel_size_m": 0.01,
+    "output_dir": "/home/he/orb3_ws/logs/run_20261113_115318_tnvkhB"
+  },
+  "clear_response": "Clear queued for next image; new keyframes will rebuild the surface map",
+  "after": {
+    "surface_points": 0,
+    "sparse_points": 689,
+    "map_id": 1,
+    "map_keyframes": 3,
+    "cached_depth_keyframes": 0,
+    "map_epoch": 3,
+    "voxel_size_m": 0.01,
+    "output_dir": "/home/he/orb3_ws/logs/run_20261113_115318_tnvkhB"
+  },
+  "empty_cloud_observed": true,
+  "passed": true
+}

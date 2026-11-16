@@ -1,0 +1,14 @@
+{
+  "depth_frames": 104,
+  "odom_messages": 25,
+  "path_messages": 25,
+  "path_poses_last": 2285,
+  "near_depth_temporal_noise_median_mm": 1.3506942659240113,
+  "valid_depth_fraction": 0.4685774739583333,
+  "depth_hz": 13.668803268920133,
+  "position_span_m": [
+    0.0004194867925295248,
+    0.0002069503758984209,
+    0.0001933642416613729
+  ]
+}

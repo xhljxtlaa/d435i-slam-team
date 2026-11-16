@@ -1,0 +1,20 @@
+{
+  "/path": {
+    "count": 180,
+    "frame": "world",
+    "poses": 299
+  },
+  "/odometry": {
+    "count": 180,
+    "frame": "world",
+    "position": [
+      0.03927289727294745,
+      -0.11102801418152933,
+      0.013565819858167329
+    ]
+  },
+  "/image_track": {
+    "count": 362,
+    "frame": "world"
+  }
+}

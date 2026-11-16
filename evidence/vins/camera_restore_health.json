@@ -1,0 +1,14 @@
+{
+  "/camera/camera/infra1/image_rect_raw": {
+    "count": 238,
+    "last_stamp": 1793938097.0703535
+  },
+  "/camera/camera/depth/image_rect_raw": {
+    "count": 100,
+    "last_stamp": 1793938097.0036669
+  },
+  "/camera/camera/imu": {
+    "count": 1595,
+    "last_stamp": 1793938097.100547
+  }
+}

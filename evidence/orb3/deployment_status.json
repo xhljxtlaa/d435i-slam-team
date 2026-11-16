@@ -1,0 +1,189 @@
+{
+  "updated_at": "2026-11-13T03:35:04.361788+00:00",
+  "status": "installed_rgbd_verified_inertial_stability_pending",
+  "workspace": "/home/he/orb3_ws",
+  "GitHub_access": true,
+  "USB_access": true,
+  "build_complete": true,
+  "rgbd_runtime_verified": true,
+  "rgbd_audit": {
+    "duration_seconds": 30.0,
+    "streams": {
+      "image": {
+        "count": 895,
+        "mean_hz": 29.860749952808376,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.06668543815612793
+      },
+      "depth": {
+        "count": 757,
+        "mean_hz": 25.27952407657527,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.16669416427612305
+      },
+      "imu": {
+        "count": 6000,
+        "mean_hz": 200.00086557566107,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.009988546371459961
+      },
+      "pose": {
+        "count": 756,
+        "mean_hz": 25.302501814310386,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.16669416427612305
+      }
+    },
+    "nearest_depth_image_dt_median_seconds": 0.0,
+    "nonzero_finite_depth_fraction_median": 0.18415364583333332,
+    "pose_finite": true,
+    "pose_axis_span_metres": [
+      0.0003788768663071096,
+      0.00028529024712042883,
+      0.000656434174743481
+    ],
+    "tracking_state_counts": {
+      "2": 756
+    },
+    "imu_initialized_seen": false
+  },
+  "inertial_received_and_initialized": true,
+  "inertial_stable": false,
+  "inertial_active_map_resets": 14,
+  "remaining": [
+    "continuous-motion inertial initialization and stability validation",
+    "camera-IMU joint calibration",
+    "dynamic accuracy with reference trajectory"
+  ],
+  "active_intrinsics_profile": "/home/he/orb3_ws/config/vins_intrinsics.json",
+  "active_intrinsics_source": "VINS checkerboard calibration 2026-11-06; SDK serial and image geometry verified",
+  "active_run": "/home/he/orb3_ws/logs/run_20261113_113259_w44j5B",
+  "rgbd_with_vins_intrinsics_audit": {
+    "duration_seconds": 25.0,
+    "streams": {
+      "image": {
+        "count": 748,
+        "mean_hz": 29.914634842049878,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.06668424606323242
+      },
+      "depth": {
+        "count": 638,
+        "mean_hz": 25.543638391553237,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.16669726371765137
+      },
+      "imu": {
+        "count": 4990,
+        "mean_hz": 199.98298915114273,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.009987831115722656
+      },
+      "pose": {
+        "count": 540,
+        "mean_hz": 25.380251432151613,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.16669726371765137
+      }
+    },
+    "nearest_depth_image_dt_median_seconds": 0.0,
+    "nonzero_finite_depth_fraction_median": 0.2307486979166667,
+    "pose_finite": true,
+    "pose_axis_span_metres": [
+      0.0004943937819916755,
+      0.0003483468317426741,
+      0.0005046192090958357
+    ],
+    "tracking_state_counts": {
+      "2": 540
+    },
+    "imu_initialized_seen": false
+  },
+  "active_mode": "rgbd",
+  "imu_enabled_live_audit": {
+    "duration_seconds": 25.0,
+    "streams": {
+      "image": {
+        "count": 740,
+        "mean_hz": 29.593668578020893,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.06668853759765625
+      },
+      "depth": {
+        "count": 604,
+        "mean_hz": 24.24457641425504,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.20006489753723145
+      },
+      "imu": {
+        "count": 4986,
+        "mean_hz": 199.81731637365277,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.009989023208618164
+      },
+      "pose": {
+        "count": 483,
+        "mean_hz": 22.80310617393013,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.43340635299682617
+      }
+    },
+    "nearest_depth_image_dt_median_seconds": 0.0,
+    "nonzero_finite_depth_fraction_median": 0.4170247395833333,
+    "pose_finite": true,
+    "pose_axis_span_metres": [
+      0.06249178573489189,
+      0.09924644231796265,
+      0.048830874264240265
+    ],
+    "tracking_state_counts": {
+      "1": 30,
+      "2": 483
+    },
+    "imu_initialized_seen": true
+  },
+  "current_note": "IMU received near 200 Hz; initialization observed but repeated insufficient-motion map resets remain.",
+  "requested_mode": "rgbd_imu",
+  "recovery_note": "Temporarily restored RGB-D after user reported missing image and abnormal path. RViz image subscription restored; path segmentation fixed at tracking resets and inertial alignment. Inertial accuracy remains unvalidated.",
+  "rgbd_recovery_audit": {
+    "duration_seconds": 25.0,
+    "streams": {
+      "image": {
+        "count": 741,
+        "mean_hz": 29.633593609546345,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.10001635551452637
+      },
+      "depth": {
+        "count": 634,
+        "mean_hz": 25.348736155193023,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.13335490226745605
+      },
+      "imu": {
+        "count": 5005,
+        "mean_hz": 200.1369358183629,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.009988069534301758
+      },
+      "pose": {
+        "count": 530,
+        "mean_hz": 25.305927661364713,
+        "strictly_monotonic": true,
+        "max_gap_seconds": 0.13335490226745605
+      }
+    },
+    "nearest_depth_image_dt_median_seconds": 0.0,
+    "nonzero_finite_depth_fraction_median": 0.4267757161458333,
+    "pose_finite": true,
+    "pose_axis_span_metres": [
+      0.00035005665267817676,
+      0.0002876162179745734,
+      0.00023473369219573215
+    ],
+    "tracking_state_counts": {
+      "2": 530
+    },
+    "imu_initialized_seen": false
+  }
+}

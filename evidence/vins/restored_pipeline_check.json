@@ -1,0 +1,30 @@
+{
+  "/camera/camera/depth/image_rect_raw": {
+    "count": 135,
+    "size": [
+      640,
+      480
+    ]
+  },
+  "/camera/depth_preview": {
+    "count": 42,
+    "size": [
+      640,
+      542
+    ]
+  },
+  "/camera/camera/imu": {
+    "count": 2398
+  },
+  "/path": {
+    "count": 45,
+    "poses": 149
+  },
+  "/odometry": {
+    "count": 133
+  },
+  "/accumulated_cloud": {
+    "count": 12,
+    "points": 157
+  }
+}

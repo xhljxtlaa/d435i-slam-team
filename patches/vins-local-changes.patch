@@ -1,0 +1,523 @@
+diff --git a/vins/src/estimator/estimator.cpp b/vins/src/estimator/estimator.cpp
+index 53ee2b8..ef24eaf 100755
+--- a/vins/src/estimator/estimator.cpp
++++ b/vins/src/estimator/estimator.cpp
+@@ -8,6 +8,8 @@
+  *******************************************************/
+ 
+ #include "estimator.h"
++#include "../utility/depth_observation.h"
++#include "../utility/tracking_health.h"
+ #include "../utility/visualization.h"
+ 
+ Estimator::Estimator(): f_manager{Rs}
+@@ -29,6 +31,8 @@ Estimator::~Estimator()
+ void Estimator::clearState()
+ {
+     mProcess.lock();
++    std::lock_guard<std::mutex> queues_lock(mBuf);
++    weakTrackingFrames = 0;
+     while(!accBuf.empty())
+         accBuf.pop();
+     while(!gyrBuf.empty())
+@@ -36,6 +40,7 @@ void Estimator::clearState()
+     while(!featureBuf.empty())
+         featureBuf.pop();
+ 
++    sensorDepthBuf.clear();
+     prevTime = -1;
+     curTime = 0;
+     openExEstimation = 0;
+@@ -115,7 +120,7 @@ void Estimator::setParameter()
+     td = TD;
+     g = G;
+     cout << "set g " << g.transpose() << endl;
+-    featureTracker.readIntrinsicParameter(CAM_NAMES);
++    if(featureTracker.m_camera.empty()) featureTracker.readIntrinsicParameter(CAM_NAMES);
+ 
+     std::cout << "MULTIPLE_THREAD is " << MULTIPLE_THREAD << '\n';
+     if (MULTIPLE_THREAD && !initThreadFlag)
+@@ -164,16 +169,38 @@ void Estimator::changeSensorType(int use_imu, int use_stereo)
+     }
+ }
+ 
+-void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1)
++void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1, const cv::Mat &depth)
+ {
+     inputImageCnt++;
+     map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> featureFrame;
+     TicToc featureTrackerTime;
+ 
+-    if(_img1.empty())
++    if(USE_DEPTH || _img1.empty())
+         featureFrame = featureTracker.trackImage(t, _img);
+     else
+         featureFrame = featureTracker.trackImage(t, _img, _img1);
++    map<int, double> sensor_depths;
++    if(USE_DEPTH) {
++        if(depth.empty() || depth.size()!=_img.size() || depth.type()!=CV_32FC1) {
++            ROS_WARN("Skipping frame: missing/unaligned metric depth image");
++            return;
++        }
++        for(auto &entry : featureFrame) {
++            auto &observations = entry.second;
++            observations.resize(1);
++            const auto &left = observations[0].second;
++            double z = sampleMetricDepth(depth, left(3), left(4), DEPTH_MIN, DEPTH_MAX);
++            if(z <= 0) continue;
++            Eigen::Vector3d right = depthObservationInRight(left.head<3>(), z, RIC[0], TIC[0], RIC[1], TIC[1]);
++            if(!right.allFinite() || right.z()<=0) continue;
++            Eigen::Matrix<double,7,1> virtual_right;
++            virtual_right << right.x()/right.z(), right.y()/right.z(), 1., 0., 0., 0., 0.;
++            observations.emplace_back(1, virtual_right);
++            sensor_depths[entry.first]=z;
++        }
++        if(inputImageCnt%60==0)
++            ROS_INFO("Sensor depth observations: %zu / %zu tracked features", sensor_depths.size(), featureFrame.size());
++    }
+     //printf("featureTracker time: %f\n", featureTrackerTime.toc());
+ 
+     if (SHOW_TRACK)
+@@ -184,10 +211,11 @@ void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1)
+     
+     if(MULTIPLE_THREAD)  
+     {     
+-        if(inputImageCnt % 2 == 0)
++        if(USE_DEPTH || inputImageCnt % 2 == 0)
+         {
+             mBuf.lock();
+             featureBuf.push(make_pair(t, featureFrame));
++            if(USE_DEPTH) sensorDepthBuf[t]=sensor_depths;
+             mBuf.unlock();
+         }
+     }
+@@ -195,6 +223,7 @@ void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1)
+     {
+         mBuf.lock();
+         featureBuf.push(make_pair(t, featureFrame));
++        if(USE_DEPTH) sensorDepthBuf[t]=sensor_depths;
+         mBuf.unlock();
+         TicToc processTime;
+         processMeasurements();
+@@ -317,6 +346,12 @@ void Estimator::processMeasurements()
+                 // cout << "2-2)" << endl;
+             }
+ 
++            map<int,double> sensor_depths;
++            auto depths_it=sensorDepthBuf.find(feature.first);
++            if(depths_it!=sensorDepthBuf.end()) {
++                sensor_depths=std::move(depths_it->second);
++                sensorDepthBuf.erase(depths_it);
++            }
+             featureBuf.pop();
+             mBuf.unlock();
+ 
+@@ -340,7 +375,14 @@ void Estimator::processMeasurements()
+             // cout << "4" << endl;
+ 
+             mProcess.lock();
+-            processImage(feature.second, feature.first);
++            processImage(feature.second, feature.first, sensor_depths);
++            if(failure_occur) {
++                mProcess.unlock();
++                clearState();
++                setParameter();
++                pubEstimatorReset(feature.first);
++                continue;
++            }
+             prevTime = curTime;
+ 
+             // cout << "5" << endl;
+@@ -451,7 +493,7 @@ void Estimator::processIMU(double t, double dt, const Vector3d &linear_accelerat
+     gyr_0 = angular_velocity; 
+ }
+ 
+-void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, const double header)
++void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, const double header, const map<int,double> &sensor_depths)
+ {
+ 
+ 
+@@ -470,6 +512,14 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
+         //printf("non-keyframe\n");
+     }
+ 
++    if(USE_DEPTH) {
++        for(auto &f : f_manager.feature) {
++            if(f.start_frame==frame_count) {
++                auto it=sensor_depths.find(f.feature_id);
++                if(it!=sensor_depths.end()) f.estimated_depth=it->second;
++            }
++        }
++    }
+     ROS_DEBUG("%s", marginalization_flag ? "Non-keyframe" : "Keyframe");
+     ROS_DEBUG("Solving %d", frame_count);
+     ROS_DEBUG("number of feature: %d", f_manager.getFeatureCount());
+@@ -584,7 +634,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
+     }
+     else
+     {
+-        if(!USE_IMU)
++        if(!USE_IMU || USE_DEPTH)
+             f_manager.initFramePoseByPnP(frame_count, Ps, Rs, tic, ric);
+         f_manager.triangulate(frame_count, Ps, Rs, tic, ric);
+ 
+@@ -605,12 +655,9 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
+ 
+         if (failureDetection())
+         {
+-            ROS_WARN("failure detection!");
++            ROS_WARN("Tracking lost or invalid state; resetting estimator and visual map");
+             failure_occur = 1;
+-            clearState();
+-            setParameter();
+-            ROS_WARN("system reboot!");
+-            return;
++            return; // caller releases mProcess before resetting; no recursive mutex lock
+         }
+ 
+         slideWindow();
+@@ -1008,51 +1055,9 @@ void Estimator::double2vector()
+ 
+ bool Estimator::failureDetection()
+ {
+-    return false;
+-    if (f_manager.last_track_num < 2)
+-    {
+-        ROS_INFO(" little feature %d", f_manager.last_track_num);
+-        //return true;
+-    }
+-    if (Bas[WINDOW_SIZE].norm() > 2.5)
+-    {
+-        ROS_INFO(" big IMU acc bias estimation %f", Bas[WINDOW_SIZE].norm());
+-        return true;
+-    }
+-    if (Bgs[WINDOW_SIZE].norm() > 1.0)
+-    {
+-        ROS_INFO(" big IMU gyr bias estimation %f", Bgs[WINDOW_SIZE].norm());
+-        return true;
+-    }
+-    /*
+-    if (tic(0) > 1)
+-    {
+-        ROS_INFO(" big extri param estimation %d", tic(0) > 1);
+-        return true;
+-    }
+-    */
+-    Vector3d tmp_P = Ps[WINDOW_SIZE];
+-    if ((tmp_P - last_P).norm() > 5)
+-    {
+-        //ROS_INFO(" big translation");
+-        //return true;
+-    }
+-    if (abs(tmp_P.z() - last_P.z()) > 1)
+-    {
+-        //ROS_INFO(" big z translation");
+-        //return true; 
+-    }
+-    Matrix3d tmp_R = Rs[WINDOW_SIZE];
+-    Matrix3d delta_R = tmp_R.transpose() * last_R;
+-    Quaterniond delta_Q(delta_R);
+-    double delta_angle;
+-    delta_angle = acos(delta_Q.w()) * 2.0 / 3.14 * 180.0;
+-    if (delta_angle > 50)
+-    {
+-        ROS_INFO(" big delta_angle ");
+-        //return true;
+-    }
+-    return false;
++    return trackingStateFailed(Ps[WINDOW_SIZE], Ps[WINDOW_SIZE-1], Rs[WINDOW_SIZE],
++        Vs[WINDOW_SIZE], Bas[WINDOW_SIZE], Bgs[WINDOW_SIZE],
++        f_manager.getFeatureCount(), USE_IMU, weakTrackingFrames);
+ }
+ 
+ void Estimator::optimization()
+diff --git a/vins/src/estimator/estimator.h b/vins/src/estimator/estimator.h
+index bf27b8c..76ccd92 100755
+--- a/vins/src/estimator/estimator.h
++++ b/vins/src/estimator/estimator.h
+@@ -52,9 +52,9 @@ class Estimator
+     void initFirstPose(Eigen::Vector3d p, Eigen::Matrix3d r);
+     void inputIMU(double t, const Vector3d &linearAcceleration, const Vector3d &angularVelocity);
+     void inputFeature(double t, const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &featureFrame);
+-    void inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1 = cv::Mat());
++    void inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1 = cv::Mat(), const cv::Mat &depth = cv::Mat());
+     void processIMU(double t, double dt, const Vector3d &linear_acceleration, const Vector3d &angular_velocity);
+-    void processImage(const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, const double header);
++    void processImage(const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, const double header, const map<int, double> &sensor_depths = {});
+     void processMeasurements();
+     void changeSensorType(int use_imu, int use_stereo);
+ 
+@@ -138,6 +138,8 @@ class Estimator
+     int frame_count;
+     int sum_of_outlier, sum_of_back, sum_of_front, sum_of_invalid;
+     int inputImageCnt;
++    int weakTrackingFrames = 0;
++    map<double, map<int, double>> sensorDepthBuf;
+ 
+     FeatureManager f_manager;
+     MotionEstimator m_estimator;
+diff --git a/vins/src/estimator/feature_manager.cpp b/vins/src/estimator/feature_manager.cpp
+index d6022a4..b27d604 100755
+--- a/vins/src/estimator/feature_manager.cpp
++++ b/vins/src/estimator/feature_manager.cpp
+@@ -77,6 +77,7 @@ bool FeatureManager::addFeatureCheckParallax(int frame_count, const map<int, vec
+ 
+         if (it == feature.end())
+         {
++            if(USE_DEPTH && !f_per_fra.is_stereo) continue;
+             feature.push_back(FeaturePerId(feature_id, frame_count));
+             feature.back().feature_per_frame.push_back(f_per_fra);
+             new_feature_num++;
+@@ -234,7 +235,15 @@ bool FeatureManager::solvePoseByPnP(Eigen::Matrix3d &R, Eigen::Vector3d &P,
+     cv::eigen2cv(P_initial, t);
+     cv::Mat K = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);  
+     bool pnp_succ;
+-    pnp_succ = cv::solvePnP(pts3D, pts2D, K, D, rvec, t, 1);
++    if(USE_DEPTH) {
++        cv::Mat inliers;
++        pnp_succ = cv::solvePnPRansac(pts3D,pts2D,K,D,rvec,t,true,100,3.0/FOCAL_LENGTH,0.99,inliers,cv::SOLVEPNP_ITERATIVE);
++        if(pnp_succ && inliers.rows>=6) {
++            vector<cv::Point3f> xyz; vector<cv::Point2f> uv;
++            for(int k=0;k<inliers.rows;k++) {int i=inliers.at<int>(k);xyz.push_back(pts3D[i]);uv.push_back(pts2D[i]);}
++            pnp_succ=cv::solvePnP(xyz,uv,K,D,rvec,t,true);
++        } else pnp_succ=false;
++    } else pnp_succ = cv::solvePnP(pts3D, pts2D, K, D, rvec, t, 1);
+     //pnp_succ = solvePnPRansac(pts3D, pts2D, K, D, rvec, t, true, 100, 8.0 / focalLength, 0.99, inliers);
+ 
+     if(!pnp_succ)
+@@ -306,6 +315,7 @@ void FeatureManager::triangulate(int frameCnt, Vector3d Ps[], Matrix3d Rs[], Vec
+         if (it_per_id.estimated_depth > 0)
+             continue;
+ 
++        if(USE_DEPTH) continue; // Never initialize from image triangulation in measured-depth mode.
+         if(STEREO && it_per_id.feature_per_frame[0].is_stereo)
+         {
+             int imu_i = it_per_id.start_frame;
+diff --git a/vins/src/estimator/parameters.cpp b/vins/src/estimator/parameters.cpp
+index 82992e9..3468d5c 100755
+--- a/vins/src/estimator/parameters.cpp
++++ b/vins/src/estimator/parameters.cpp
+@@ -39,6 +39,9 @@ double TD;
+ int NUM_OF_CAM;
+ int STEREO;
+ int USE_IMU;
++int USE_DEPTH = 0;
++std::string DEPTH_TOPIC;
++double DEPTH_SCALE = 0.001, DEPTH_MIN = 0.25, DEPTH_MAX = 6.0;
+ int MULTIPLE_THREAD;
+ map<int, Eigen::Vector3d> pts_gt;
+ std::string IMAGE0_TOPIC, IMAGE1_TOPIC;
+@@ -98,6 +101,16 @@ void readParameters(std::string config_file)
+     USE_GPU_ACC_FLOW = fsSettings["use_gpu_acc_flow"];
+     USE_GPU_CERES = fsSettings["use_gpu_ceres"];
+ 
++    USE_DEPTH = fsSettings["use_depth"].empty() ? 0 : (int)fsSettings["use_depth"];
++    if (USE_DEPTH) {
++        fsSettings["depth_topic"] >> DEPTH_TOPIC;
++        if (!fsSettings["depth_scale"].empty()) DEPTH_SCALE = (double)fsSettings["depth_scale"];
++        if (!fsSettings["depth_min"].empty()) DEPTH_MIN = (double)fsSettings["depth_min"];
++        if (!fsSettings["depth_max"].empty()) DEPTH_MAX = (double)fsSettings["depth_max"];
++        if (DEPTH_TOPIC.empty() || DEPTH_SCALE <= 0 || DEPTH_MIN <= 0 || DEPTH_MAX <= DEPTH_MIN)
++            throw std::runtime_error("Invalid sensor depth configuration");
++        ROS_INFO("Using measured camera depth: %s, scale=%f, range=%f..%f m", DEPTH_TOPIC.c_str(), DEPTH_SCALE, DEPTH_MIN, DEPTH_MAX);
++    }
+     USE_IMU = fsSettings["imu"];
+     printf("USE_IMU: %d\n", USE_IMU);
+     if(USE_IMU)
+@@ -205,5 +218,7 @@ void readParameters(std::string config_file)
+         printf("no imu, fix extrinsic param; no time offset calibration\n");
+     }
+ 
++    if(USE_DEPTH && (NUM_OF_CAM!=2 || ESTIMATE_EXTRINSIC!=0 || ESTIMATE_TD!=0 || std::abs(TD)>1e-9))
++        throw std::runtime_error("Measured-depth mode requires two virtual camera models, fixed extrinsics and zero fixed time offset");
+     fsSettings.release();
+ }
+diff --git a/vins/src/estimator/parameters.h b/vins/src/estimator/parameters.h
+index 50ba1af..321aee6 100755
+--- a/vins/src/estimator/parameters.h
++++ b/vins/src/estimator/parameters.h
+@@ -59,6 +59,9 @@ extern int ROW, COL;
+ extern int NUM_OF_CAM;
+ extern int STEREO;
+ extern int USE_IMU;
++extern int USE_DEPTH;
++extern std::string DEPTH_TOPIC;
++extern double DEPTH_SCALE, DEPTH_MIN, DEPTH_MAX;
+ extern int MULTIPLE_THREAD;
+ // pts_gt for debug purpose;
+ extern map<int, Eigen::Vector3d> pts_gt;
+diff --git a/vins/src/featureTracker/feature_tracker.h b/vins/src/featureTracker/feature_tracker.h
+index 1df4ea5..a55ce38 100755
+--- a/vins/src/featureTracker/feature_tracker.h
++++ b/vins/src/featureTracker/feature_tracker.h
+@@ -11,7 +11,7 @@
+ 
+ #pragma once
+ 
+-#define GPU_MODE 0
++//#define GPU_MODE 0
+ 
+ 
+ #include <cstdio>
+@@ -98,3 +98,5 @@ public:
+     int n_id;
+     bool hasPrediction;
+ };
++
++
+diff --git a/vins/src/rosNodeTest.cpp b/vins/src/rosNodeTest.cpp
+index 813da9e..eead902 100755
+--- a/vins/src/rosNodeTest.cpp
++++ b/vins/src/rosNodeTest.cpp
+@@ -35,6 +35,7 @@ void img0_callback(const sensor_msgs::msg::Image::SharedPtr img_msg)
+     m_buf.lock();
+     // std::cout << "Left : " << img_msg->header.stamp.sec << "." << img_msg->header.stamp.nanosec << endl;
+     img0_buf.push(img_msg);
++    while(img0_buf.size()>30) img0_buf.pop();
+     m_buf.unlock();
+ }
+ 
+@@ -43,6 +44,7 @@ void img1_callback(const sensor_msgs::msg::Image::SharedPtr img_msg)
+     m_buf.lock();
+     // std::cout << "Right: " << img_msg->header.stamp.sec << "." << img_msg->header.stamp.nanosec << endl;
+     img1_buf.push(img_msg);
++    while(img1_buf.size()>30) img1_buf.pop();
+     m_buf.unlock();
+ }
+ 
+@@ -103,7 +105,14 @@ void sync_process()
+                     header = img0_buf.front()->header;
+                     image0 = getImageFromMsg(img0_buf.front());
+                     img0_buf.pop();
+-                    image1 = getImageFromMsg(img1_buf.front());
++                    if(USE_DEPTH) {
++                        const auto &msg=img1_buf.front();
++                        if(msg->encoding=="16UC1" || msg->encoding=="mono16")
++                            cv_bridge::toCvCopy(msg)->image.convertTo(image1,CV_32FC1,DEPTH_SCALE);
++                        else if(msg->encoding=="32FC1")
++                            image1=cv_bridge::toCvCopy(msg)->image.clone();
++                        else ROS_ERROR("Unsupported depth encoding: %s",msg->encoding.c_str());
++                    } else image1 = getImageFromMsg(img1_buf.front());
+                     img1_buf.pop();
+                     //printf("find img0 and img1\n");
+ 
+@@ -113,8 +122,10 @@ void sync_process()
+                 }
+             }
+             m_buf.unlock();
+-            if(!image0.empty())
+-                estimator.inputImage(time, image0, image1);
++            if(!image0.empty()) {
++                if(USE_DEPTH) estimator.inputImage(time,image0,cv::Mat(),image1);
++                else estimator.inputImage(time,image0,image1);
++            }
+         }
+         else
+         {
+@@ -269,15 +280,15 @@ int main(int argc, char **argv)
+     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr sub_imu = NULL;
+     if(USE_IMU)
+     {
+-        sub_imu = n->create_subscription<sensor_msgs::msg::Imu>(IMU_TOPIC, rclcpp::QoS(rclcpp::KeepLast(2000)), imu_callback);
++        sub_imu = n->create_subscription<sensor_msgs::msg::Imu>(IMU_TOPIC, rclcpp::QoS(rclcpp::KeepLast(2000)).best_effort(), imu_callback);
+     }
+     auto sub_feature = n->create_subscription<sensor_msgs::msg::PointCloud>("/feature_tracker/feature", rclcpp::QoS(rclcpp::KeepLast(2000)), feature_callback);
+-    auto sub_img0 = n->create_subscription<sensor_msgs::msg::Image>(IMAGE0_TOPIC, rclcpp::QoS(rclcpp::KeepLast(100)), img0_callback);
++    auto sub_img0 = n->create_subscription<sensor_msgs::msg::Image>(IMAGE0_TOPIC, rclcpp::QoS(rclcpp::KeepLast(30)).best_effort(), img0_callback);
+     
+     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_img1 = NULL;
+     if(STEREO)
+     {
+-        sub_img1 = n->create_subscription<sensor_msgs::msg::Image>(IMAGE1_TOPIC, rclcpp::QoS(rclcpp::KeepLast(100)), img1_callback);
++        sub_img1 = n->create_subscription<sensor_msgs::msg::Image>(USE_DEPTH ? DEPTH_TOPIC : IMAGE1_TOPIC, rclcpp::QoS(rclcpp::KeepLast(30)).best_effort(), img1_callback);
+     }
+     
+     auto sub_restart = n->create_subscription<std_msgs::msg::Bool>("/vins_restart", rclcpp::QoS(rclcpp::KeepLast(100)), restart_callback);
+diff --git a/vins/src/utility/visualization.cpp b/vins/src/utility/visualization.cpp
+index 23c0cd6..ba7fc51 100755
+--- a/vins/src/utility/visualization.cpp
++++ b/vins/src/utility/visualization.cpp
+@@ -18,6 +18,8 @@ rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_key_poses;
+ rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pub_camera_pose;
+ rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pub_camera_pose_visual;
+ nav_msgs::msg::Path path;
++rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pub_estimator_reset;
++static double last_path_publish = -1;
+ 
+ rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pub_keyframe_pose;
+ rclcpp::Publisher<sensor_msgs::msg::PointCloud>::SharedPtr pub_keyframe_point;
+@@ -33,23 +35,40 @@ size_t pub_counter = 0;
+ 
+ void registerPub(rclcpp::Node::SharedPtr n)
+ {
++    pub_estimator_reset = n->create_publisher<std_msgs::msg::Bool>("vins_estimator_reset",10);
+     pub_latest_odometry = n->create_publisher<nav_msgs::msg::Odometry>("imu_propagate", 1000);
+-    pub_path = n->create_publisher<nav_msgs::msg::Path>("path", 1000);
+-    pub_odometry = n->create_publisher<nav_msgs::msg::Odometry>("odometry", 1000);
+-    pub_point_cloud = n->create_publisher<sensor_msgs::msg::PointCloud>("point_cloud", 1000);
++    pub_path = n->create_publisher<nav_msgs::msg::Path>("path", 1);
++    pub_odometry = n->create_publisher<nav_msgs::msg::Odometry>("odometry", 10);
++    pub_point_cloud = n->create_publisher<sensor_msgs::msg::PointCloud>("point_cloud", 1);
+     pub_margin_cloud = n->create_publisher<sensor_msgs::msg::PointCloud>("margin_cloud", 1000);
+     pub_key_poses = n->create_publisher<visualization_msgs::msg::Marker>("key_poses", 1000);
+     pub_camera_pose = n->create_publisher<nav_msgs::msg::Odometry>("camera_pose", 1000);
+-    pub_camera_pose_visual = n->create_publisher<visualization_msgs::msg::MarkerArray>("camera_pose_visual", 1000);
++    pub_camera_pose_visual = n->create_publisher<visualization_msgs::msg::MarkerArray>("camera_pose_visual", 1);
+     pub_keyframe_pose = n->create_publisher<nav_msgs::msg::Odometry>("keyframe_pose", 1000);
+     pub_keyframe_point = n->create_publisher<sensor_msgs::msg::PointCloud>("keyframe_point", 1000);
+     pub_extrinsic = n->create_publisher<nav_msgs::msg::Odometry>("extrinsic", 1000);
+-    pub_image_track = n->create_publisher<sensor_msgs::msg::Image>("image_track", 1000);
++    pub_image_track = n->create_publisher<sensor_msgs::msg::Image>("image_track", 1);
+ 
+     cameraposevisual.setScale(0.1);
+     cameraposevisual.setLineWidth(0.01);
+ }
+ 
++
++void pubEstimatorReset(double timestamp)
++{
++    path.poses.clear();
++    path.header.frame_id="world";
++    path.header.stamp.sec=static_cast<int>(timestamp);
++    path.header.stamp.nanosec=static_cast<unsigned>((timestamp-path.header.stamp.sec)*1e9);
++    last_path_publish=-1;
++    pub_path->publish(path);
++    sensor_msgs::msg::PointCloud empty;
++    empty.header=path.header;
++    pub_point_cloud->publish(empty);
++    std_msgs::msg::Bool reset; reset.data=true;
++    pub_estimator_reset->publish(reset);
++}
++
+ void pubLatestOdometry(const Eigen::Vector3d &P, const Eigen::Quaterniond &Q, const Eigen::Vector3d &V, double t)
+ {
+     nav_msgs::msg::Odometry odometry;
+@@ -160,8 +179,14 @@ void pubOdometry(const Estimator &estimator, const std_msgs::msg::Header &header
+         pose_stamped.pose = odometry.pose.pose;
+         path.header = header;
+         path.header.frame_id = "world";
+-        path.poses.push_back(pose_stamped);
+-        pub_path->publish(path);
++        const double timestamp=header.stamp.sec+header.stamp.nanosec*1e-9;
++        if(timestamp < last_path_publish) { path.poses.clear(); last_path_publish=-1; }
++        if(last_path_publish<0 || timestamp-last_path_publish>=0.2) {
++            path.poses.push_back(pose_stamped);
++            if(path.poses.size()>3000) path.poses.erase(path.poses.begin());
++            pub_path->publish(path);
++            last_path_publish=timestamp;
++        }
+ 
+         // write result to file
+         ofstream foutC(VINS_RESULT_PATH, ios::app);
+diff --git a/vins/src/utility/visualization.h b/vins/src/utility/visualization.h
+index ab31748..5c5f569 100755
+--- a/vins/src/utility/visualization.h
++++ b/vins/src/utility/visualization.h
+@@ -43,6 +43,7 @@ extern rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pub_po
+ extern int IMAGE_ROW, IMAGE_COL;
+ 
+ void registerPub(rclcpp::Node::SharedPtr n);
++void pubEstimatorReset(double timestamp);
+ 
+ void pubLatestOdometry(const Eigen::Vector3d &P, const Eigen::Quaterniond &Q, const Eigen::Vector3d &V, double t);
+ 

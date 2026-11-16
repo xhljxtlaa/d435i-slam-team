@@ -1,0 +1,54 @@
+{
+  "name": "VINS checkerboard calibration 2026-11-06",
+  "device_serial": "261722075550",
+  "image_topic": "/camera/camera/infra1/image_rect_raw",
+  "image_size": [
+    640,
+    480
+  ],
+  "reference_driver_projection": [
+    386.1178283691406,
+    0,
+    322.3638610839844,
+    0,
+    0,
+    386.1178283691406,
+    235.6132354736328,
+    0,
+    0,
+    0,
+    1,
+    0
+  ],
+  "K": [
+    [
+      387.5705156157698,
+      0.0,
+      322.1352572643484
+    ],
+    [
+      0.0,
+      387.8610833980658,
+      237.68206059673338
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "D": [
+    0.004934431861272019,
+    -0.0005403015950811035,
+    0.0009535474791643598,
+    0.0017400569470627063,
+    0.0
+  ],
+  "baseline_m": 0.04990977579932175,
+  "input_domain": "Already-rectified infra1 pixels, same topic as the original checkerboard capture; D models residual distortion of these pixels.",
+  "original_report": "/home/he/vins_ws/calibration/checkerboard/session_20261106_1045/stereo_calibration_report.json",
+  "report_sha256": "35e797428fa9c47a878eeeac57782ccf85935ae10793286904fe44fc72e0d236",
+  "samples": 48,
+  "heldout_stereo_rms_px": 0.12528222619811774,
+  "camera_imu_calibrated": false
+}

@@ -1,0 +1,23 @@
+{
+  "saved_at": "2026-11-06T12:12:08.986902+08:00",
+  "name": "D435i depth + infrared + IMU v1",
+  "source_commit": "8993f559d93f7235c7cefe8f4951ef349d8cf245",
+  "original_workspace": "/home/he/vins_ws",
+  "mode": "sensor depth + infrared tracking + IMU",
+  "depth_range_m": [
+    0.18,
+    6.0
+  ],
+  "preview_range_m": [
+    0.18,
+    1.0
+  ],
+  "map_range_m": [
+    0.18,
+    8.0
+  ],
+  "rviz_point_size_pixels": 2,
+  "ros": "Humble",
+  "device": "D435i",
+  "scope": "Frozen executable and source for the current computer; requires installed ROS2/OpenCV/RealSense dependencies."
+}

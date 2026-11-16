@@ -1,0 +1,32 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 016e743..fbe8fc6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,12 +14,12 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+ 
+ # Check C++11 or C++0x support
+ include(CheckCXXCompilerFlag)
+-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
++CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX11)
+ CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+ if(COMPILER_SUPPORTS_CXX11)
+-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    add_definitions(-DCOMPILEDWITHC11)
+-   message(STATUS "Using flag -std=c++11.")
++   message(STATUS "Using flag -std=c++14.")
+ elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    add_definitions(-DCOMPILEDWITHC0X)
+diff --git a/src/System.cc b/src/System.cc
+index 60d9c51..502d269 100644
+--- a/src/System.cc
++++ b/src/System.cc
+@@ -1338,6 +1338,7 @@ vector<cv::KeyPoint> System::GetTrackedKeyPointsUn()
+ 
+ double System::GetTimeFromIMUInit()
+ {
++    if (!mpAtlas->isImuInitialized()) return 0.0;
+     double aux = mpLocalMapper->GetCurrKFTime()-mpLocalMapper->mFirstTs;
+     if ((aux>0.) && mpAtlas->isImuInitialized())
+         return mpLocalMapper->GetCurrKFTime()-mpLocalMapper->mFirstTs;

@@ -1,0 +1,17 @@
+{
+  "driver": {
+    "left_reprojection_rms_px": 0.13460945308973024,
+    "samples": 48
+  },
+  "vins_calibration": {
+    "left_reprojection_rms_px": 0.12398389718437862,
+    "samples": 48
+  },
+  "scope": "Old calibration observations; fitted model uses the same data, so this is a consistency check, not a new independent accuracy test.",
+  "original_heldout_stereo_rms_px": 0.12528222619811774,
+  "serials": {
+    "2-2": "261643069248"
+  },
+  "sdk_device_serial": "261722075550",
+  "serials_note": "USB bus serial differs from the SDK camera serial; profile identity must use the camera device_info service."
+}
