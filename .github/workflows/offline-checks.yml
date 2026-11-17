@@ -1,0 +1,16 @@
+name: offline-checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install offline test dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ pkg-config libopencv-dev libeigen3-dev
+      - name: Syntax, runtime configuration and existing regression tests
+        run: ./scripts/check.sh
