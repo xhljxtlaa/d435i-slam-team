@@ -1,0 +1,129 @@
+{
+  "generated_at": "2026-11-18",
+  "raw_synchronized_rosbag_available": false,
+  "calibration_images": "vins_ws/calibration/checkerboard/session_20261106_1045",
+  "calibration_stereo_pairs": 48,
+  "examples": [
+    {
+      "path": "data/examples/orb3_rgbd_20261113/camera.yaml",
+      "bytes": 1439,
+      "sha256": "dee3698f3eea8edb371be9d0bc25ff1254dc1dfedae08776335a38b39fc24136"
+    },
+    {
+      "path": "data/examples/orb3_rgbd_20261113/camera.yaml.json",
+      "bytes": 859,
+      "sha256": "6d26cc12fc26d9da9f9dd47b856fb9af375fcd9591fcb62dcc26b673205f824b"
+    },
+    {
+      "path": "data/examples/orb3_rgbd_20261113/camera_pose.tum",
+      "bytes": 122872,
+      "sha256": "ff7dd332d9f1a5ef199652c8cfe0a046767133fb7e5c5782aeadd23d5130bebf",
+      "poses": 1128,
+      "segment_boundaries": 0
+    },
+    {
+      "path": "data/examples/orb3_rgbd_20261113/keyframes.tum",
+      "bytes": 91,
+      "sha256": "adb01cb117e22a037904cf79da450ba67070ef87e5ad9ac45de602c54ae44095",
+      "poses": 1,
+      "segment_boundaries": 0
+    },
+    {
+      "path": "data/examples/orb3_rgbd_20261113/optimized_trajectory.tum",
+      "bytes": 119488,
+      "sha256": "11a453e1e616d33a048dea58384ea986238fac88f4ec4502ac63636b5f41e82b",
+      "poses": 1128,
+      "segment_boundaries": 0
+    },
+    {
+      "path": "data/examples/orb3_sparse_map_20261113/camera.yaml",
+      "bytes": 1536,
+      "sha256": "11b9832a59da84b8b014dd51434a70d41fc48e422982aae041f13c6a1c9bb971"
+    },
+    {
+      "path": "data/examples/orb3_sparse_map_20261113/camera.yaml.json",
+      "bytes": 1360,
+      "sha256": "2e698af71cdcd8b9c097c18b1ed21209753551743860242160c79d95934fb3b3"
+    },
+    {
+      "path": "data/examples/orb3_sparse_map_20261113/map.json",
+      "bytes": 123,
+      "sha256": "53b19ae42212ccf310d63a5d8b14b0a3b5eabf8400406b5db28282ac9e727827"
+    },
+    {
+      "path": "data/examples/orb3_sparse_map_20261113/map_sparse.ply",
+      "bytes": 91279,
+      "sha256": "908eda7f0fd8259f7de44da4a02dbd384be397b1396f6aac067b4118c7a04845",
+      "vertices": 5696
+    },
+    {
+      "path": "data/examples/vins_20261106/README.txt",
+      "bytes": 344,
+      "sha256": "f3357153a66fb7e6226bcfd53d941775be34de19d99eae6d26b040294753a34f"
+    },
+    {
+      "path": "data/examples/vins_20261106/camera.yaml",
+      "bytes": 531,
+      "sha256": "eb146a5f020fcca06cbfe4b7e7da2167cd366306d9384359048edff78c0ed099"
+    },
+    {
+      "path": "data/examples/vins_20261106/depth_imu.yaml",
+      "bytes": 3204,
+      "sha256": "d7abdb9b18742a8b9842815ddb9bd6e420cd82a08c4816b31422e0fae2258e6e"
+    },
+    {
+      "path": "data/examples/vins_20261106/left.yaml",
+      "bytes": 338,
+      "sha256": "99d7f60438cecb5a5728a74e058d553fb8bc35267c5dcdb7a2a35c8ab442f882"
+    },
+    {
+      "path": "data/examples/vins_20261106/metadata.json",
+      "bytes": 708,
+      "sha256": "e6a731ab578c0db4b5d57a8d63e787135c9b5a77d8c2a1f001e2220f4fa81120"
+    },
+    {
+      "path": "data/examples/vins_20261106/pointcloud.ply",
+      "bytes": 42007,
+      "sha256": "f70142f6d4bc78fa3d3a5e4b9238e2ceccebe04bd4892d356577c83dc340efde",
+      "vertices": 703
+    },
+    {
+      "path": "data/examples/vins_20261106/right.yaml",
+      "bytes": 340,
+      "sha256": "269d621bfe0b902d2af83d0f50b6dfb59f873e2f174b6ffd04e1d366bd3edb94"
+    },
+    {
+      "path": "data/examples/vins_20261106/trajectory.csv",
+      "bytes": 52608,
+      "sha256": "a0758e5af6cbfeba23ad36f0e0fa3b9d6fe872891c5e6f7eca2b302d37451347"
+    },
+    {
+      "path": "data/examples/vins_20261106/trajectory.tum",
+      "bytes": 52569,
+      "sha256": "48897017a1a873981e5a9e3b6a669ebee7cf86561b2afb1503eef066426c83f7",
+      "poses": 386,
+      "segment_boundaries": 0
+    },
+    {
+      "path": "data/examples/vins_20261106/trajectory_pointcloud.pdf",
+      "bytes": 88469,
+      "sha256": "e30782f3e8b32f05686c6529a62a639cc25fa832ec04dfe9523b1fdf2fc97b5a"
+    },
+    {
+      "path": "data/examples/vins_20261106/trajectory_pointcloud.png",
+      "bytes": 570934,
+      "sha256": "40d8f207ac8fce8171a2ed953fc8d3f21d35a3f7e27ac615ece40169ae188ceb"
+    },
+    {
+      "path": "data/examples/vins_20261106/trajectory_raw.csv",
+      "bytes": 457104,
+      "sha256": "ff471974de2ba3872374f12ba655b852b2c62c7638d32ff9e3e5c35710b02ef9"
+    },
+    {
+      "path": "data/examples/vins_20261106/visualization_stats.json",
+      "bytes": 315,
+      "sha256": "b237e3f2dbdc00f787eec74b331d12f3c85e8469604f199ff26010a6f9b0ed96"
+    }
+  ],
+  "warning": "Historical algorithm outputs, not ground truth. No synchronized image/depth/IMU rosbag was found. IMU CSV/NPZ and calibration PNGs cannot reproduce the complete tracking input."
+}

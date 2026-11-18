@@ -1,0 +1,79 @@
+{
+  "captured_at_unix": 1794542305.4301767,
+  "ir_frame": "camera_infra1_optical_frame",
+  "depth_frame": "camera_depth_optical_frame",
+  "imu_frame": "camera_imu_optical_frame",
+  "device_serial": "261722075550",
+  "driver_projection": [
+    386.1178283691406,
+    0.0,
+    322.3638610839844,
+    0.0,
+    0.0,
+    386.1178283691406,
+    235.6132354736328,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+  ],
+  "projection": [
+    387.5705156157698,
+    0.0,
+    322.1352572643484,
+    0.0,
+    0.0,
+    387.8610833980658,
+    237.68206059673338,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+  ],
+  "distortion": [
+    0.004934431861272019,
+    -0.0005403015950811035,
+    0.0009535474791643598,
+    0.0017400569470627063,
+    0.0
+  ],
+  "size": [
+    640,
+    480
+  ],
+  "T_b_c1": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      -0.0055200001224875415
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.005100000184029343
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.011739999987185001
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "imu_hz": 200.25323466221056,
+  "depth_encoding": "16UC1",
+  "depth_map_factor": 1000.0,
+  "imu_noise_calibrated": false,
+  "source": "live ROS geometry/TF + VINS checkerboard intrinsics",
+  "intrinsics_profile": "/home/he/orb3_ws/config/vins_intrinsics.json",
+  "camera_imu_calibrated": false
+}

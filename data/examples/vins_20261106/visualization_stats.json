@@ -1,0 +1,13 @@
+{
+  "trajectory_poses": 386,
+  "cloud_points": 703,
+  "duration_s": 95.79004001617432,
+  "estimated_path_length_m": 1.1621307305291733,
+  "start_to_end_distance_m": 0.04465688177113187,
+  "trajectory_xyz_span_m": [
+    0.209972192016,
+    0.15201814556319,
+    0.09497262331119
+  ],
+  "nearfield_cube_points": 306
+}

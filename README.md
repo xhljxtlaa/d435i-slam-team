@@ -10,6 +10,18 @@
 
 完整状态见 [STATUS](docs/STATUS.md)。这次整理完成的离线检查见 [CHECKS](docs/CHECKS.md)，它与此前实机验证分开记录。
 
+## 组员获取数据
+
+先执行 `git pull --ff-only`。本次已补充 [data/examples](data/examples/) 中的轨迹、稀疏点云和实验预览；原有 48 对棋盘标定图仍在 `vins_ws/calibration/checkerboard/`。
+
+[完整历史实验数据下载](https://github.com/xhljxtlaa/d435i-slam-team/releases/tag/data-20261118)：约 24 MB、217 个原始文件，含 ORB3 多次运行、VINS 输出、标定原图、IMU CSV/NPZ。也可运行：
+
+```bash
+python3 scripts/fetch_data.py
+```
+
+**目前仍缺少同步红外图＋深度＋IMU 的完整原始 rosbag，无法仅靠这些结果重新运行完整定位链路。** 当前没有连接 D435i；已准备 `scripts/record_bag.sh` 供后续实机补录。已有数据的格式、用途和限制详见 [数据说明](data/README.md)。
+
 ## 第一次部署
 
 环境基线：Ubuntu 22.04、ROS 2 Humble、OpenCV 4.5.4、RealSense SDK 2.58.4、D435i USB 3.x。不同系统版本需另行验证。
@@ -64,6 +76,7 @@ VINS 启动器在 `vins_ws/output/run_*/` 生成本轮配置和输出目录，�
 - `vins_ws/calibration/checkerboard/`：48 对原始棋盘图、观测点及标定报告；24.4 mm 方格、8×6 内角点。
 - `docs/history/`：两段部署聊天的用户消息与助手最终答复；历史状态可能已被后续覆盖。
 - `evidence/`：既往运行审计和最终验证日志；`docs/archive/` 保存冻结版说明。
+- `data/`：可直接使用的精选轨迹/点云、数据清单与完整历史数据的 Release 下载入口。
 - `dependencies.lock.json`、`patches/`、`docs/SOURCE_MANIFEST.json`：上游提交、原始改动和归档来源。
 - `.github/`：问题/实验模板、PR 模板与不接相机的自动检查。
 
@@ -71,6 +84,6 @@ VINS 启动器在 `vins_ws/output/run_*/` 生成本轮配置和输出目录，�
 
 按 [CONTRIBUTING](CONTRIBUTING.md) 分支、提交和评审。建议一人维护设备与标定，一人负责 ORB3，一人负责 VINS；每个 PR 由另一人检查。账号确定后可填写 [TEAM](docs/TEAM.md)。任务清单见 [BACKLOG](docs/BACKLOG.md)。
 
-原工作区和冻结可执行版本仍保留在原电脑。编译目录、第三方大词典、运行点云、临时轨迹和二进制包不纳入 Git；需要的上游资源获取方式见部署文档。历史文档中的 `/home/he/...` 是当时路径，团队运行优先使用本 README 的相对入口。
+原工作区和冻结可执行版本仍保留在原电脑。编译目录、第三方大词典、临时运行输出和二进制包不纳入 Git；精选实验轨迹/点云明确保存在 `data/examples/`，完整历史数据通过 Release 共享。需要的上游资源获取方式见部署文档。历史文档中的 `/home/he/...` 是当时路径，团队运行优先使用本 README 的相对入口。
 
 源码保留上游 GPL 许可证及各文件原有声明，详见 [THIRD_PARTY](THIRD_PARTY.md)。

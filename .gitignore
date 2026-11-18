@@ -27,3 +27,9 @@ vins_ws/calibration/results/
 !.env.example
 **/.venv/
 **/brief_k10L6.bin
+
+# Curated examples are shared with the team; generated recordings stay local.
+!data/examples/**/*.tum
+!data/examples/**/*.ply
+data/downloads/
+data/recordings/

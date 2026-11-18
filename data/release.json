@@ -1,0 +1,9 @@
+{
+  "tag": "data-20261118",
+  "archive": "d435i-experiment-data-20261118.tar.gz",
+  "sha256": "041397d8cb5965365abcf0c615b0155c8d4ead4428eca5ef17ff175dbad7c24e",
+  "bytes": 24344679,
+  "url": "https://github.com/xhljxtlaa/d435i-slam-team/releases/download/data-20261118/d435i-experiment-data-20261118.tar.gz",
+  "archived_original_files": 217,
+  "raw_synchronized_rosbag_available": false
+}

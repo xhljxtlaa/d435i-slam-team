@@ -1,0 +1,12 @@
+{
+  "saved_at": "2026-11-06T11:59:34.432198+08:00",
+  "frame": "world",
+  "trajectory_poses": 386,
+  "cloud_points": 703,
+  "trajectory_sampled_display_rate_hz": 5,
+  "trajectory_history_limit": 3000,
+  "trajectory_first_timestamp_s": 1793937478.4240186,
+  "trajectory_last_timestamp_s": 1793937574.2140586,
+  "mode": "measured camera depth + left infrared + IMU",
+  "note": "trajectory.tum/csv use exact ROS pose timestamps; trajectory_raw.csv is full-rate VINS log whose original timestamps are rounded to whole seconds. Cloud is sparse accumulated world-frame VINS landmarks, not dense depth reconstruction. Trajectory and cloud were captured during live operation, not as a strictly synchronized pair."
+}
