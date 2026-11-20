@@ -1,0 +1,89 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Image
+      Name: D435i RGB
+      Enabled: true
+      Topic:
+        Depth: 2
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /camera/camera/color/image_raw
+    - Class: rviz_default_plugins/Image
+      Name: D435i Aligned Depth
+      Enabled: true
+      Normalize Range: true
+      Topic:
+        Depth: 2
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /camera/camera/aligned_depth_to_color/image_raw
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Alpha: 0.35
+      Cell Size: 0.5
+      Plane Cell Count: 20
+    - Class: rviz_default_plugins/PointCloud2
+      Name: RTAB-Map Cloud
+      Enabled: true
+      Color Transformer: RGB8
+      Position Transformer: XYZ
+      Style: Points
+      Size (Pixels): 3
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /rtabmap/cloud_map
+    - Class: rviz_default_plugins/Path
+      Name: Optimized Trajectory
+      Enabled: true
+      Buffer Length: 1
+      Color: 70; 240; 140
+      Line Style: Billboards
+      Line Width: 0.025
+      Pose Style: None
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /rtabmap/mapPath
+  Enabled: true
+  Global Options:
+    Background Color: 30; 33; 39
+    Fixed Frame: map
+    Frame Rate: 15
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 4
+      Focal Point:
+        X: 0.7
+        Y: 0
+        Z: 0.2
+      Pitch: 0.65
+      Yaw: 4.6
+      Target Frame: <Fixed Frame>
+      Name: Current View
+Window Geometry:
+  Width: 1400
+  Height: 900
+  X: 35
+  Y: 45

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18",
+  "generated_at": "2026-11-20",
   "raw_synchronized_rosbag_available": false,
   "calibration_images": "vins_ws/calibration/checkerboard/session_20261106_1045",
   "calibration_stereo_pairs": 48,
@@ -55,6 +55,20 @@
       "bytes": 91279,
       "sha256": "908eda7f0fd8259f7de44da4a02dbd384be397b1396f6aac067b4118c7a04845",
       "vertices": 5696
+    },
+    {
+      "path": "data/examples/rtabmap_rgbd_20261120/trajectory.csv",
+      "bytes": 9069,
+      "sha256": "cd9edc21f177cd857fd3cd5632fe2ae0ab1b7929d872cadabe2c63543eac3e0c",
+      "poses": 79,
+      "segment_boundaries": 0
+    },
+    {
+      "path": "data/examples/rtabmap_rgbd_20261120/trajectory_map_1.tum",
+      "bytes": 8500,
+      "sha256": "06e02a30f40a4a2673599ad0abcefc1f29eb4489c21ef450a89d39f98d7f82ad",
+      "poses": 79,
+      "segment_boundaries": 0
     },
     {
       "path": "data/examples/vins_20261106/README.txt",
