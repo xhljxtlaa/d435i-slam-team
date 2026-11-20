@@ -9,6 +9,7 @@
 **/.build-complete
 orb3_ws/vendor/
 orb3_ws/deps/
+rtabmap_ws/deps/
 .deps/
 vins_ws/calibration/python/
 vins_ws/calibration/results/

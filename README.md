@@ -1,4 +1,4 @@
-# D435i · ORB-SLAM3 / VINS-Fusion 三人协作工作区
+# D435i · ORB-SLAM3 / VINS-Fusion / RTAB-Map 协作工作区
 
 整理自本机 2026-11-06 的 VINS/D435i 与 2026-11-13 的 ORB3/D435i 部署聊天、实际源码、标定和运行记录。`insfusion` 在这些会话中指 VINS-Fusion。
 
@@ -7,6 +7,7 @@
 | ORB-SLAM3 | `orb3_ws/start.sh rgbd` | 既往 RGB-D 实机跟踪通过；默认仅显示 ORB 稀疏特征点和轨迹 |
 | ORB-SLAM3 惯性 | `orb3_ws/start.sh rgbd_imu` | 接入和初始化已有记录，但多次地图重置，稳定性未通过 |
 | VINS-Fusion 本地深度扩展 | `vins_ws/start.sh` | 左红外 + D435i 测距 + IMU；有运行及失效恢复记录，动态精度与联合标定待完成 |
+| RTAB-Map | `rtabmap_ws/start.sh` | D435i 彩色图和对齐深度；已验证实机轨迹及彩色点云输出 |
 
 完整状态见 [STATUS](docs/STATUS.md)。这次整理完成的离线检查见 [CHECKS](docs/CHECKS.md)，它与此前实机验证分开记录。
 
@@ -69,10 +70,13 @@ python3 vins_ws/tools/depth_preview.py
 
 VINS 启动器在 `vins_ws/output/run_*/` 生成本轮配置和输出目录，自动解析当前电脑路径。跟踪失效后会清图重建；累积点是稀疏路标。不要把跨地图重置的轨迹拼成同一个世界坐标系。
 
+RTAB-Map 使用 Humble 软件包。安装依赖后，接入相机，在仓库根目录运行 `./rtabmap_ws/start.sh`。启动参数、可视化和轨迹导出见 [RTAB-Map 运行说明](rtabmap_ws/README.md)。
+
 ## 仓库内容
 
 - `orb3_ws/`：本地 ROS 2 接口、独立后端、运行脚本和标定复用配置；核心依赖按已验证 SHA 下载。
 - `vins_ws/src/`：可以直接修改的 VINS-Fusion ROS2 源码，包含深度约束、PnP 和跟踪失效恢复扩展。
+- `rtabmap_ws/` 含 D435i RGB-D 建图启动文件、RViz 配置和轨迹导出说明。
 - `vins_ws/calibration/checkerboard/`：48 对原始棋盘图、观测点及标定报告；24.4 mm 方格、8×6 内角点。
 - `docs/history/`：两段部署聊天的用户消息与助手最终答复；历史状态可能已被后续覆盖。
 - `evidence/`：既往运行审计和最终验证日志；`docs/archive/` 保存冻结版说明。
