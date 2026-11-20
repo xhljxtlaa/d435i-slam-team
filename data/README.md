@@ -13,6 +13,7 @@ git pull --ff-only
 | VINS 轨迹、点云与预览 | [examples/vins_20261106](examples/vins_20261106/) | 386 个位姿、703 个稀疏点；阅读 TUM/CSV、点云显示和结果分析 |
 | ORB3 RGB-D 验证轨迹 | [examples/orb3_rgbd_20261113](examples/orb3_rgbd_20261113/) | 1128 个实时位姿及优化轨迹；检查输出格式 |
 | ORB3 稀疏地图 | [examples/orb3_sparse_map_20261113](examples/orb3_sparse_map_20261113/) | 5696 个特征点，二进制 PLY，坐标系为 orb3_map |
+| RTAB-Map RGB-D 轨迹 | [examples/rtabmap_rgbd_20261120](examples/rtabmap_rgbd_20261120/) | 同一地图段的 79 个优化关键帧，提供 TUM 和 CSV |
 | 棋盘原图、角点与报告 | [48 对原图](../vins_ws/calibration/checkerboard/session_20261106_1045/) | 重算和核对既有双目标定 |
 | 全部历史运行与数值诊断 | [数据 Release](https://github.com/xhljxtlaa/d435i-slam-team/releases/tag/data-20261118) | 217 个原始文件，含多次 ORB3 运行、VINS 历史输出、标定和 IMU 诊断 |
 | 同步红外＋深度＋IMU rosbag | **尚未录制或找到** | 目前不能直接离线重跑完整定位链路 |
@@ -39,13 +40,15 @@ python3 scripts/fetch_data.py
 - `diagnostics/`：实际采集的 IMU CSV、数值 NPZ 和诊断报告。
 - `MANIFEST.json`：217 个原文件的 SHA256 与大小。
 
-`data/index.json` 给出随 Git 提供的 22 个样例文件的来源分类、校验和及位姿/点数。
+`data/index.json` 记录随 Git 提供的样例文件、校验和及位姿或点云数量。
 
 ## 数据含义与限制
 
 轨迹都是算法估计结果，没有提供 ground truth。VINS 样例的轨迹和点云是在运行中分别保存的，不能视作严格同步的一对；原始 `trajectory_raw.csv` 时间戳曾舍入到整秒，分析时间用 `trajectory.tum`。
 
 ORB3 稀疏地图来自 `run_20261113_115824_Zt4I1K` 的末次地图，`map_id=4`。完整数据包中该次运行的轨迹有 4 个 `# segment` 边界，不能把整份轨迹与最后一张地图当成同一连续坐标系。表面地图是此前密集模式的历史产物，当前启动仍默认仅显示稀疏特征点。
+
+RTAB-Map 样例保存于 2026-11-20 11:10:57（UTC+8），取自 `map_id=1`。轨迹是在 `map` 坐标系中优化后的 `camera_link` 位姿，时间戳单位为秒，位置单位为米，四元数按 `qx qy qz qw` 排列。CSV 同时保留地图段与关键帧 ID。
 
 数据包保留了排查阶段失败、发散与重置片段，包括异常点云备份；它们供故障分析使用。选择结果时参照 [STATUS](../docs/STATUS.md) 和相应运行审计。
 
